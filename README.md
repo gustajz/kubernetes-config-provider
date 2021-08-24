@@ -20,7 +20,7 @@ config.providers.secrets.param.namespace=default
 >CONNECT_CONFIG_PROVIDERS: secrets
 >CONNECT_CONFIG_PROVIDERS_SECRETS_CLASS: com.github.gustajz.kafka.config.provider.KubernetesSecretConfigProvider
 >CONNECT_CONFIG_PROVIDERS_SECRETS_PARAM_NAMESPACE: default
->>```
+>```
 
 3. Configure connector with secure properties.
 ```
