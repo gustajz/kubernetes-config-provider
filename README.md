@@ -30,8 +30,8 @@ password=${secrets:my-secret:my_password_key}
 
 ## More Documentation
 
-* [Externalizing Secrets] https://docs.confluent.io/platform/current/connect/security.html#externalizing-secrets
-* [KIP] https://cwiki.apache.org/confluence/display/KAFKA/KIP-297%3A+Externalizing+Secrets+for+Connect+Configurations
+* [Externalizing Secrets](https://docs.confluent.io/platform/current/connect/security.html#externalizing-secrets)
+* [KIP](https://cwiki.apache.org/confluence/display/KAFKA/KIP-297%3A+Externalizing+Secrets+for+Connect+Configurations)
 
 ## License
 
