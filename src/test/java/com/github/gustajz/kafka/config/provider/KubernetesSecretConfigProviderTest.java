@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.kafka.common.config.ConfigData;
+import org.apache.kafka.common.config.ConfigException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -96,30 +97,66 @@ class KubernetesSecretConfigProviderTest {
     }
 
     @Test
+    void testKeyNotFound() {
+        ConfigException thrown =
+                assertThrows(
+                        ConfigException.class,
+                        () ->
+                                configProvider.get(
+                                        "my-secret", Collections.singleton("testKeyNotFound")));
+        assertTrue(thrown.getMessage().contains("my-secret"));
+        assertTrue(thrown.getMessage().contains("testKeyNotFound"));
+    }
+
+    @Test
     void testEmptyPath() {
-        ConfigData configData = configProvider.get("", Collections.singleton("testKey"));
-        assertTrue(configData.data().isEmpty());
-        assertNull(configData.ttl());
+        ConfigException thrown =
+                assertThrows(
+                        ConfigException.class,
+                        () -> configProvider.get("", Collections.singleton("testKey")));
+        assertTrue(
+                thrown.getMessage()
+                        .contains(
+                                "secretName cannot be null or empty. Review your configuration."));
     }
 
     @Test
     void testEmptyPathWithKey() {
-        ConfigData configData = configProvider.get("");
-        assertTrue(configData.data().isEmpty());
-        assertNull(configData.ttl());
+        ConfigException thrown = assertThrows(ConfigException.class, () -> configProvider.get(""));
+        assertTrue(
+                thrown.getMessage()
+                        .contains(
+                                "secretName cannot be null or empty. Review your configuration."));
     }
 
     @Test
     void testNullPath() {
-        ConfigData configData = configProvider.get(null);
-        assertTrue(configData.data().isEmpty());
-        assertNull(configData.ttl());
+        ConfigException thrown =
+                assertThrows(ConfigException.class, () -> configProvider.get(null));
+        assertTrue(
+                thrown.getMessage()
+                        .contains(
+                                "secretName cannot be null or empty. Review your configuration."));
+    }
+
+    @Test
+    void testNoSecretFoundException() {
+        ConfigException thrown =
+                assertThrows(
+                        ConfigException.class,
+                        () -> configProvider.get("notExists", Collections.singleton("testKey")));
+        assertTrue(thrown.getMessage().contains("notExists"));
     }
 
     @Test
     void testNullPathWithKey() {
-        ConfigData configData = configProvider.get(null, Collections.singleton("testKey"));
-        assertTrue(configData.data().isEmpty());
-        assertNull(configData.ttl());
+        ConfigException thrown =
+                assertThrows(
+                        ConfigException.class,
+                        () -> configProvider.get(null, Collections.singleton("testKey")));
+        assertTrue(
+                thrown.getMessage()
+                        .contains(
+                                "secretName cannot be null or empty. Review your configuration."));
     }
 }

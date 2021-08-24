@@ -6,6 +6,7 @@ plugins {
 
 group 'com.github.gustajz.kafka'
 version '1.0-SNAPSHOT'
+sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
 	mavenCentral()

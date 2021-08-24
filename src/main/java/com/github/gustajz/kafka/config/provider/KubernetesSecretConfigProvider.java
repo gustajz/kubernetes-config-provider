@@ -30,16 +30,20 @@ public class KubernetesSecretConfigProvider implements ConfigProvider {
      */
     @Override
     public ConfigData get(String secretName) {
-        log.info(secretName);
+        log.info("Read data from secret '{}'.", secretName);
 
         if (isBlank(secretName)) {
-            return new ConfigData(Collections.emptyMap());
+            throw new ConfigException(
+                    "secretName cannot be null or empty. Review your configuration.");
         }
 
         try {
             return new ConfigData(readSecretValues(secretName));
         } catch (IOException | ApiException ex) {
-            throw new ConfigException(ex.getMessage(), ex);
+            throw new ConfigException(
+                    String.format(
+                            "Failed to read data from secret. Review your configuration: %s",
+                            ex.getMessage()));
         }
     }
 
@@ -52,11 +56,11 @@ public class KubernetesSecretConfigProvider implements ConfigProvider {
      */
     @Override
     public ConfigData get(String secretName, Set<String> keys) {
-        log.info(secretName);
-        log.info("{}", keys);
+        log.info("Read keys {} from secret '{}'.", keys, secretName);
 
         if (isBlank(secretName)) {
-            return new ConfigData(Collections.emptyMap());
+            throw new ConfigException(
+                    "secretName cannot be null or empty. Review your configuration.");
         }
 
         try {
@@ -71,22 +75,25 @@ public class KubernetesSecretConfigProvider implements ConfigProvider {
                         }
                     });
 
+            if (filtered.isEmpty()) {
+                throw new ConfigException(secretName, Objects.toString(keys), "Key not found.");
+            }
             return new ConfigData(filtered);
 
         } catch (IOException | ApiException ex) {
-            throw new ConfigException(ex.getMessage(), ex);
+            throw new ConfigException(secretName, Objects.toString(keys), ex.getMessage());
         }
     }
 
     /**
      * Configure this class with the given key-value pairs.
      *
-     * @param configs namespace=XXXX
+     * @param configs namespace=name
      */
     @Override
     public void configure(Map<String, ?> configs) {
         this.namespace = (String) configs.getOrDefault("namespace", null);
-        notNull(this.namespace);
+        notNull(this.namespace, "No namespace specified. Review your configuration.");
     }
 
     @Override
