@@ -1,0 +1,55 @@
+plugins {
+	id 'com.github.johnrengelman.shadow' version '7.0.0'
+	id 'com.diffplug.gradle.spotless' version '4.5.1'
+	id 'java'
+}
+
+group 'com.github.gustajz.kafka'
+version '1.0-SNAPSHOT'
+sourceCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation "org.apache.kafka:kafka-clients:${kafkaClientsVersion}"
+	implementation "io.kubernetes:client-java:${kubernetesClientVersion}"
+
+	testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+	testImplementation "io.fabric8:kubernetes-server-mock:${kubernetesMockVersion}"
+	testImplementation "com.squareup.okhttp3:mockwebserver:${okhttp3Version}"
+	testImplementation "com.squareup.okhttp3:okhttp:${okhttp3Version}"
+	testImplementation "org.junit-pioneer:junit-pioneer:${junitPioneerVersion}"
+
+	testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+
+	compileOnly "org.projectlombok:lombok:${lombokVersion}"
+	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+	testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+	testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+}
+
+shadowJar {
+	minimize()
+	dependencies {
+		exclude(dependency('org.apache.kafka:kafka-clients'))
+	}
+}
+
+test {
+	useJUnitPlatform()
+}
+
+spotless {
+	format 'misc', {
+		target '*.gradle', '*.md', '.gitignore'
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+	java {
+		importOrder()
+		removeUnusedImports()
+		googleJavaFormat().aosp()
+	}
+}
